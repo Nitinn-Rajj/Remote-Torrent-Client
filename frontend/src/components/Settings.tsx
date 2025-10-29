@@ -51,7 +51,7 @@ const Settings: React.FC = () => {
         <p className="text-xs font-semibold uppercase tracking-[0.6em] text-[#969a87]">Calibration</p>
         <h1 className="mt-2 text-4xl font-semibold tracking-tight text-[#2e3326]">Settings</h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#686c59]">
-          Tweak the transmission stack. These controls keep the retro rig humming while embracing modern transfer throughput.
+          Update directories, ports, and download limits to keep the client running the way you prefer.
         </p>
       </div>
 
@@ -105,14 +105,14 @@ const Settings: React.FC = () => {
               />
             </div>
 
+            {/* Upload Throughput Throttle */}
             <div className="flex flex-col gap-3">
               <label className="text-xs font-semibold uppercase tracking-[0.4em] text-[#8a8e7a]">
                 Upload Throughput Throttle
               </label>
-              <div className="rounded-[1.1rem] border border-dashed border-[#d6ccb8]/70 bg-[#f8f3ea]/70 px-4 py-3 text-xs uppercase tracking-[0.35em] text-[#9a9e8b] shadow-[inset_1px_1px_2px_rgba(255,255,255,0.75)] outline outline-1 outline-[#faf5eb]/60">
-                governed by enable upload toggle
-              </div>
+              <div className="rounded-[1.1rem] border border-dashed border-[#d6ccb8]/70 bg-[#f8f3ea]/70 px-4 py-3 text-xs uppercase tracking-[0.35em] text-[#9a9e8b] shadow-[inset_1px_1px_2px_rgba(255,255,255,0.75)] outline outline-1 outline-[#faf5eb]/60" />
             </div>
+
           </div>
 
           {/* Checkboxes */}

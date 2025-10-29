@@ -29,7 +29,7 @@ const Dashboard = () => {
           <p className="text-xs font-semibold uppercase tracking-[0.6em] text-[#979b86]">Mission Control</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#2e3226]">Dashboard</h1>
           <p className="mt-2 max-w-lg text-sm leading-relaxed text-[#676a5a]">
-            Live telemetry of torrent activity, channel health, and transfer flow — retro console, future ready.
+            Monitor torrents at a glance and manage downloads without leaving this screen.
           </p>
         </div>
         <AddTorrentButton />

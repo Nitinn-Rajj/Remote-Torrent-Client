@@ -35,9 +35,6 @@ const Sidebar: React.FC = () => {
                 <h1 className="mt-2 text-[1.65rem] font-semibold tracking-tight text-[#393e2f]">
                   Remote Torrent
                 </h1>
-                <p className="mt-1 text-[0.78rem] text-[#7b7f6d]">
-                  Operator console v2.5·γ
-                </p>
               </div>
             </div>
             <div className="hidden gap-2 lg:flex">
