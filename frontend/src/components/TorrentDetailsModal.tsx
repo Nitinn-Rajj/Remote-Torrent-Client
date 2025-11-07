@@ -101,10 +101,10 @@ const TorrentDetailsModal: React.FC<TorrentDetailsModalProps> = ({ isOpen, torre
     .reduce((sum, f) => sum + f.Size, 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative mx-4 w-full max-w-4xl overflow-hidden rounded-[2rem] border border-[#dcd3c2]/70 bg-[linear-gradient(135deg,_rgba(251,247,240,0.98)_0%,_rgba(236,227,213,0.95)_100%)] shadow-[inset_2px_2px_5px_rgba(255,255,255,0.84),12px_18px_38px_rgba(69,56,42,0.18)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden rounded-[2rem] border border-[#dcd3c2]/70 bg-[linear-gradient(135deg,_rgba(251,247,240,0.98)_0%,_rgba(236,227,213,0.95)_100%)] shadow-[inset_2px_2px_5px_rgba(255,255,255,0.84),12px_18px_38px_rgba(69,56,42,0.18)]">
         {/* Header */}
-        <div className="border-b border-[#dcd3c2]/50 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.8)_0%,_rgba(246,240,230,0.6)_100%)] p-6">
+        <div className="flex-shrink-0 border-b border-[#dcd3c2]/50 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.8)_0%,_rgba(246,240,230,0.6)_100%)] p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h2 className="text-2xl font-bold tracking-tight text-[#343429]">{torrent.Name}</h2>
@@ -143,8 +143,8 @@ const TorrentDetailsModal: React.FC<TorrentDetailsModalProps> = ({ isOpen, torre
           </div>
         </div>
 
-        {/* File List */}
-        <div className="max-h-[60vh] overflow-y-auto p-6">
+        {/* File List - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-6" style={{ maxHeight: 'calc(90vh - 280px)' }}>
           <div className="space-y-2">
             {torrent.Files.map((file: TorrentFile) => {
               const isSelected = selectedFiles.has(file.Path);
@@ -189,7 +189,7 @@ const TorrentDetailsModal: React.FC<TorrentDetailsModalProps> = ({ isOpen, torre
         </div>
 
         {/* Footer */}
-        <div className="border-t border-[#dcd3c2]/50 bg-[radial-gradient(circle_at_bottom,_rgba(255,255,255,0.8)_0%,_rgba(246,240,230,0.6)_100%)] p-6">
+        <div className="flex-shrink-0 border-t border-[#dcd3c2]/50 bg-[radial-gradient(circle_at_bottom,_rgba(255,255,255,0.8)_0%,_rgba(246,240,230,0.6)_100%)] p-6">
           <div className="flex justify-end gap-3">
             <button
               onClick={onClose}

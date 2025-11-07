@@ -4,12 +4,10 @@ import { openTorrentDetailsModal } from '../store/slices/uiSlice';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import TorrentList from './TorrentList';
 import AddTorrentButton from './AddTorrentButton';
-import TorrentDetailsModal from './TorrentDetailsModal';
 
 const Dashboard = () => {
   const dispatch = useAppDispatch();
-  const { items: torrents, loading, selectedTorrent } = useAppSelector((state) => state.torrents);
-  const { torrentDetailsModalOpen } = useAppSelector((state) => state.ui);
+  const { items: torrents, loading } = useAppSelector((state) => state.torrents);
 
   useEffect(() => {
     dispatch(fetchTorrents());
@@ -23,10 +21,6 @@ const Dashboard = () => {
   const handleViewFiles = (infoHash: string) => {
     dispatch(fetchTorrentFiles(infoHash));
     dispatch(openTorrentDetailsModal(infoHash));
-  };
-
-  const handleCloseModal = () => {
-    dispatch({ type: 'ui/closeTorrentDetailsModal' });
   };
 
   // Ensure torrents is always an array
@@ -145,13 +139,6 @@ const Dashboard = () => {
           )}
         </>
       )}
-
-      {/* Torrent Details Modal */}
-      <TorrentDetailsModal
-        isOpen={torrentDetailsModalOpen}
-        torrent={selectedTorrent}
-        onClose={handleCloseModal}
-      />
     </div>
   );
 };

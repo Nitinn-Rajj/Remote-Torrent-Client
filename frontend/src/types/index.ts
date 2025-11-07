@@ -55,7 +55,9 @@ export interface UIState {
   sidebarOpen: boolean;
   addTorrentModalOpen: boolean;
   torrentDetailsModalOpen: boolean; // NEW: for file selection modal
-  selectedTorrentHash: string | null; // NEW: currently selected torrent
+  deleteTorrentModalOpen: boolean; // NEW: for delete confirmation modal
+  selectedTorrentHash: string | null; // NEW: for torrent details modal
+  deleteTorrentHash: string | null; // NEW: for delete confirmation modal
   connectionStatus: 'connected' | 'disconnected' | 'connecting';
   notifications: Notification[];
 }

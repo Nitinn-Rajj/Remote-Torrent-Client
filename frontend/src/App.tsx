@@ -1,13 +1,23 @@
 import React from 'react';
-import { useAppSelector } from './hooks/redux';
+import { useAppSelector, useAppDispatch } from './hooks/redux';
+import { closeTorrentDetailsModal } from './store/slices/uiSlice';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import FileExplorer from './components/FileExplorer';
 import Settings from './components/Settings';
 import AddTorrentModal from './components/AddTorrentModal';
+import TorrentDetailsModal from './components/TorrentDetailsModal';
+import DeleteTorrentModal from './components/DeleteTorrentModal';
 
 const App: React.FC = () => {
+  const dispatch = useAppDispatch();
   const currentView = useAppSelector((state) => state.ui.currentView);
+  const { torrentDetailsModalOpen } = useAppSelector((state) => state.ui);
+  const selectedTorrent = useAppSelector((state) => state.torrents.selectedTorrent);
+
+  const handleCloseModal = () => {
+    dispatch(closeTorrentDetailsModal());
+  };
 
   const renderView = () => {
     switch (currentView) {
@@ -43,6 +53,12 @@ const App: React.FC = () => {
         </div>
       </main>
       <AddTorrentModal />
+      <TorrentDetailsModal
+        isOpen={torrentDetailsModalOpen}
+        torrent={selectedTorrent}
+        onClose={handleCloseModal}
+      />
+      <DeleteTorrentModal />
     </div>
   );
 };

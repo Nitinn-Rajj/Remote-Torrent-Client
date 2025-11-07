@@ -1,5 +1,6 @@
 import React from 'react';
-import { deleteTorrent, startTorrent, stopTorrent, fetchTorrents } from '../store/slices/torrentsSlice';
+import { startTorrent, stopTorrent, fetchTorrents } from '../store/slices/torrentsSlice';
+import { openDeleteTorrentModal } from '../store/slices/uiSlice';
 import { useAppDispatch } from '../hooks/redux';
 import { TorrentListProps } from '../types';
 
@@ -19,9 +20,7 @@ const TorrentList: React.FC<TorrentListProps> = ({ torrents, onViewFiles }) => {
   };
 
   const handleDelete = (infoHash: string) => {
-    if (confirm('Are you sure you want to delete this torrent?')) {
-      dispatch(deleteTorrent(infoHash));
-    }
+    dispatch(openDeleteTorrentModal(infoHash));
   };
 
   const handleStart = (infoHash: string) => {

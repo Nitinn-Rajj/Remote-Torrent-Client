@@ -77,6 +77,8 @@ func (e *Engine) newTorrent(tt *torrent.Torrent) error {
 	t := e.upsertTorrent(tt)
 	go func() {
 		<-t.t.GotInfo()
+		// Update the torrent to ensure Files array is initialized
+		t.Update(tt)
 		// Check if AutoStart is enabled in config
 		if e.config.AutoStart {
 			e.StartTorrent(t.InfoHash)
