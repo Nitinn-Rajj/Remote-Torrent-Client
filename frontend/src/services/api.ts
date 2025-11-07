@@ -56,7 +56,7 @@ export const fileAPI = {
   // Get file tree from backend
   getFiles: async (): Promise<FileNode | null> => {
     try {
-      const response = await api.get('/api/files');
+      const response = await api.get('/files');
       return response.data || null;
     } catch (error) {
       console.error('Failed to fetch files:', error);

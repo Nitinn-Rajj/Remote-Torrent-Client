@@ -5,6 +5,8 @@ const initialState: UIState = {
   currentView: 'dashboard', // dashboard, files, settings
   sidebarOpen: true,
   addTorrentModalOpen: false,
+  torrentDetailsModalOpen: false,
+  selectedTorrentHash: null,
   connectionStatus: 'connected', // connected, disconnected, connecting
   notifications: [],
 };
@@ -24,6 +26,14 @@ const uiSlice = createSlice({
     },
     closeAddTorrentModal: (state) => {
       state.addTorrentModalOpen = false;
+    },
+    openTorrentDetailsModal: (state, action: PayloadAction<string>) => {
+      state.torrentDetailsModalOpen = true;
+      state.selectedTorrentHash = action.payload;
+    },
+    closeTorrentDetailsModal: (state) => {
+      state.torrentDetailsModalOpen = false;
+      state.selectedTorrentHash = null;
     },
     setConnectionStatus: (state, action: PayloadAction<UIState['connectionStatus']>) => {
       state.connectionStatus = action.payload;
@@ -48,6 +58,8 @@ export const {
   toggleSidebar,
   openAddTorrentModal,
   closeAddTorrentModal,
+  openTorrentDetailsModal,
+  closeTorrentDetailsModal,
   setConnectionStatus,
   addNotification,
   removeNotification,

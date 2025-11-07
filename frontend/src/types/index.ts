@@ -6,6 +6,7 @@ export interface TorrentFile {
   Completed: number;
   Started: boolean;
   Percent: number;
+  Priority: boolean; // Whether file is selected for download
 }
 
 export interface Torrent {
@@ -53,6 +54,8 @@ export interface UIState {
   currentView: 'dashboard' | 'files' | 'settings';
   sidebarOpen: boolean;
   addTorrentModalOpen: boolean;
+  torrentDetailsModalOpen: boolean; // NEW: for file selection modal
+  selectedTorrentHash: string | null; // NEW: currently selected torrent
   connectionStatus: 'connected' | 'disconnected' | 'connecting';
   notifications: Notification[];
 }
@@ -60,6 +63,7 @@ export interface UIState {
 // Redux State types
 export interface TorrentsState {
   items: Torrent[];
+  selectedTorrent: Torrent | null; // NEW: for detailed view
   loading: boolean;
   error: string | null;
 }
@@ -107,12 +111,24 @@ export interface AddTorrentRequest {
 
 export interface UpdateConfigRequest extends Partial<Config> {}
 
+export interface UpdateFileSelectionRequest {
+  filePaths: string[];
+  action: 'start' | 'stop';
+}
+
 // Component Props types
 export interface TorrentListProps {
   torrents: Torrent[];
+  onViewFiles?: (infoHash: string) => void; // NEW: callback to open file details
 }
 
 export interface AddTorrentModalProps {
   isOpen: boolean;
+  onClose: () => void;
+}
+
+export interface TorrentDetailsModalProps {
+  isOpen: boolean;
+  torrent: Torrent | null;
   onClose: () => void;
 }

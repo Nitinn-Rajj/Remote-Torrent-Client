@@ -77,7 +77,10 @@ func (e *Engine) newTorrent(tt *torrent.Torrent) error {
 	t := e.upsertTorrent(tt)
 	go func() {
 		<-t.t.GotInfo()
-		e.StartTorrent(t.InfoHash)
+		// Check if AutoStart is enabled in config
+		if e.config.AutoStart {
+			e.StartTorrent(t.InfoHash)
+		}
 	}()
 	return nil
 }
@@ -144,10 +147,19 @@ func (e *Engine) StartTorrent(infohash string) error {
 		}
 	}
 
-	// Always call DownloadAll() even if already marked as started
-	// This ensures downloads actually begin (e.g., after backend restart)
+	// Download files based on their priority settings
 	if t.t != nil && t.t.Info() != nil {
-		t.t.DownloadAll()
+		for _, f := range t.Files {
+			if f != nil && f.f != nil {
+				if f.Priority {
+					// Download this file
+					f.f.Download()
+				} else {
+					// Don't download this file
+					f.f.SetPriority(torrent.PiecePriorityNone)
+				}
+			}
+		}
 	}
 
 	// Return error only if trying to start an already actively downloading torrent
@@ -223,6 +235,67 @@ func (e *Engine) StartFile(infohash, filepath string) error {
 
 func (e *Engine) StopFile(infohash, filepath string) error {
 	return fmt.Errorf("Unsupported")
+}
+
+// GetTorrentFiles returns detailed file information for a specific torrent
+func (e *Engine) GetTorrentFiles(infohash string) (*Torrent, error) {
+	e.mut.Lock()
+	defer e.mut.Unlock()
+
+	t, ok := e.ts[infohash]
+	if !ok {
+		return nil, fmt.Errorf("Torrent not found")
+	}
+
+	if !t.Loaded {
+		return nil, fmt.Errorf("Torrent metadata not loaded yet")
+	}
+
+	return t, nil
+}
+
+// UpdateFileSelection updates which files should be downloaded
+func (e *Engine) UpdateFileSelection(infohash string, filePaths []string, download bool) error {
+	e.mut.Lock()
+	defer e.mut.Unlock()
+
+	t, ok := e.ts[infohash]
+	if !ok {
+		return fmt.Errorf("Torrent not found")
+	}
+
+	if !t.Loaded {
+		return fmt.Errorf("Torrent metadata not loaded yet")
+	}
+
+	// Create a map for quick lookup
+	filePathMap := make(map[string]bool)
+	for _, path := range filePaths {
+		filePathMap[path] = true
+	}
+
+	// Update priority for matching files
+	for _, file := range t.Files {
+		if filePathMap[file.Path] {
+			file.Priority = download
+
+			// Update the actual torrent file priority
+			if file.f != nil {
+				if download {
+					file.f.Download()
+				} else {
+					file.f.SetPriority(torrent.PiecePriorityNone)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// SetFilePriority sets the download priority for a single file
+func (e *Engine) SetFilePriority(infohash string, filePath string, download bool) error {
+	return e.UpdateFileSelection(infohash, []string{filePath}, download)
 }
 
 func str2ih(str string) (metainfo.Hash, error) {

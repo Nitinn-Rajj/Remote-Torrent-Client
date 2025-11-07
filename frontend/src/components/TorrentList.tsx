@@ -3,7 +3,7 @@ import { deleteTorrent, startTorrent, stopTorrent, fetchTorrents } from '../stor
 import { useAppDispatch } from '../hooks/redux';
 import { TorrentListProps } from '../types';
 
-const TorrentList: React.FC<TorrentListProps> = ({ torrents }) => {
+const TorrentList: React.FC<TorrentListProps> = ({ torrents, onViewFiles }) => {
   const dispatch = useAppDispatch();
 
   const formatBytes = (bytes: number): string => {
@@ -38,6 +38,12 @@ const TorrentList: React.FC<TorrentListProps> = ({ torrents }) => {
     });
   };
 
+  const handleViewFiles = (infoHash: string) => {
+    if (onViewFiles) {
+      onViewFiles(infoHash);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {torrents.map((torrent) => {
@@ -57,6 +63,17 @@ const TorrentList: React.FC<TorrentListProps> = ({ torrents }) => {
           <div className="relative flex flex-wrap items-center gap-4 pb-4">
             <h3 className="flex-1 truncate text-lg font-semibold tracking-tight text-[#343429]">{torrent.Name}</h3>
             <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => handleViewFiles(torrent.InfoHash)}
+                disabled={!torrent.Loaded}
+                className={`rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.35em] shadow-[inset_1px_1px_2px_rgba(255,255,255,0.82),0_3px_9px_rgba(85,117,69,0.22)] transition-all duration-300 ${
+                  torrent.Loaded
+                    ? 'border-[#c8b89a]/70 bg-[linear-gradient(135deg,_rgba(245,235,218,0.95)_0%,_rgba(230,215,195,0.9)_100%)] text-[#5a4a3a] hover:-translate-y-0.5 hover:shadow-[0_5px_12px_rgba(90,74,58,0.24)]'
+                    : 'cursor-not-allowed border-[#dcd3c2]/50 bg-[linear-gradient(135deg,_rgba(236,227,213,0.7)_0%,_rgba(226,217,203,0.65)_100%)] text-[#9a8a7a] opacity-50'
+                }`}
+              >
+                Files
+              </button>
               {status === 'downloading' ? (
                 <button
                   onClick={() => handleStop(torrent.InfoHash)}

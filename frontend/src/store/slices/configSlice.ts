@@ -11,7 +11,7 @@ interface ConfigSliceState {
 export const fetchConfig = createAsyncThunk<Config>(
   'config/fetchConfig',
   async () => {
-    const response = await api.get<Config>('/api/config');
+    const response = await api.get<Config>('/config');
     return response.data;
   }
 );
@@ -19,7 +19,7 @@ export const fetchConfig = createAsyncThunk<Config>(
 export const updateConfig = createAsyncThunk<Config, Partial<Config>>(
   'config/updateConfig',
   async (config: Partial<Config>) => {
-    const response = await api.put<Config>('/api/config', config);
+    const response = await api.put<Config>('/config', config);
     return response.data;
   }
 );

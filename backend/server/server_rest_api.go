@@ -30,12 +30,16 @@ func (s *Server) handleRestAPI(w http.ResponseWriter, r *http.Request) {
 		s.getTorrents(w, r)
 	case path == "/torrent" && r.Method == "POST":
 		s.addTorrent(w, r)
-	case strings.HasPrefix(path, "/torrent/") && r.Method == "DELETE":
-		s.deleteTorrent(w, r)
+	case strings.HasPrefix(path, "/torrent/") && strings.HasSuffix(path, "/files") && r.Method == "GET":
+		s.getTorrentFiles(w, r)
+	case strings.HasPrefix(path, "/torrent/") && strings.HasSuffix(path, "/files") && r.Method == "POST":
+		s.updateTorrentFiles(w, r)
 	case strings.HasPrefix(path, "/torrent/") && strings.HasSuffix(path, "/start") && r.Method == "POST":
 		s.startTorrent(w, r)
 	case strings.HasPrefix(path, "/torrent/") && strings.HasSuffix(path, "/stop") && r.Method == "POST":
 		s.stopTorrent(w, r)
+	case strings.HasPrefix(path, "/torrent/") && r.Method == "DELETE":
+		s.deleteTorrent(w, r)
 	case path == "/config" && r.Method == "GET":
 		s.getConfig(w, r)
 	case path == "/config" && r.Method == "PUT":
@@ -185,4 +189,67 @@ func (s *Server) getFiles(w http.ResponseWriter, r *http.Request) {
 	s.state.Unlock()
 
 	json.NewEncoder(w).Encode(files)
+}
+
+// getTorrentFiles returns detailed file list for a specific torrent
+func (s *Server) getTorrentFiles(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimPrefix(r.URL.Path, "/api/torrent/")
+	infohash := strings.TrimSuffix(path, "/files")
+
+	if infohash == "" {
+		http.Error(w, "Infohash is required", http.StatusBadRequest)
+		return
+	}
+
+	torrent, err := s.engine.GetTorrentFiles(infohash)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to get torrent files: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(torrent)
+}
+
+// updateTorrentFiles updates which files should be downloaded
+func (s *Server) updateTorrentFiles(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimPrefix(r.URL.Path, "/api/torrent/")
+	infohash := strings.TrimSuffix(path, "/files")
+
+	if infohash == "" {
+		http.Error(w, "Infohash is required", http.StatusBadRequest)
+		return
+	}
+
+	var req struct {
+		FilePaths []string `json:"filePaths"`
+		Action    string   `json:"action"` // "start" or "stop"
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if len(req.FilePaths) == 0 {
+		http.Error(w, "FilePaths is required", http.StatusBadRequest)
+		return
+	}
+
+	if req.Action != "start" && req.Action != "stop" {
+		http.Error(w, "Action must be 'start' or 'stop'", http.StatusBadRequest)
+		return
+	}
+
+	download := req.Action == "start"
+
+	if err := s.engine.UpdateFileSelection(infohash, req.FilePaths, download); err != nil {
+		http.Error(w, fmt.Sprintf("Failed to update file selection: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	s.state.Push()
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"status": "success"})
 }

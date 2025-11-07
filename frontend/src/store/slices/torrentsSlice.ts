@@ -1,21 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import api from '../../services/api';
-import { Torrent, TorrentsState } from '../../types';
+import { torrentService } from '../../services/torrentService';
+import { Torrent, TorrentsState, UpdateFileSelectionRequest } from '../../types';
 
 // Async thunks
 export const fetchTorrents = createAsyncThunk<Torrent[]>(
   'torrents/fetchTorrents',
   async () => {
     try {
-      const response = await api.get<Record<string, Torrent> | Torrent[]>('/api/torrents');
-      
-      // Backend returns an object with InfoHash as keys, convert to array
-      if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
-        return Object.values(response.data);
-      } else if (Array.isArray(response.data)) {
-        return response.data;
-      }
-      return [];
+      return await torrentService.getTorrents();
     } catch (error) {
       // Silently return empty array when backend is not available
       return [];
@@ -23,18 +15,17 @@ export const fetchTorrents = createAsyncThunk<Torrent[]>(
   }
 );
 
-export const addTorrent = createAsyncThunk<Torrent, string>(
+export const addTorrent = createAsyncThunk<void, string>(
   'torrents/addTorrent',
   async (magnetLink: string) => {
-    const response = await api.post<Torrent>('/api/torrent', { magnet: magnetLink });
-    return response.data;
+    await torrentService.addTorrent(magnetLink);
   }
 );
 
 export const deleteTorrent = createAsyncThunk<string, string>(
   'torrents/deleteTorrent',
   async (infoHash: string) => {
-    await api.delete(`/api/torrent/${infoHash}`);
+    await torrentService.deleteTorrent(infoHash);
     return infoHash;
   }
 );
@@ -42,7 +33,7 @@ export const deleteTorrent = createAsyncThunk<string, string>(
 export const startTorrent = createAsyncThunk<string, string>(
   'torrents/startTorrent',
   async (infoHash: string) => {
-    await api.post(`/api/torrent/${infoHash}/start`);
+    await torrentService.startTorrent(infoHash);
     return infoHash;
   }
 );
@@ -50,13 +41,33 @@ export const startTorrent = createAsyncThunk<string, string>(
 export const stopTorrent = createAsyncThunk<string, string>(
   'torrents/stopTorrent',
   async (infoHash: string) => {
-    await api.post(`/api/torrent/${infoHash}/stop`);
+    await torrentService.stopTorrent(infoHash);
     return infoHash;
+  }
+);
+
+// NEW: Fetch detailed file information for a specific torrent
+export const fetchTorrentFiles = createAsyncThunk<Torrent, string>(
+  'torrents/fetchTorrentFiles',
+  async (infoHash: string) => {
+    return await torrentService.getTorrentFiles(infoHash);
+  }
+);
+
+// NEW: Update file selection
+export const updateFileSelection = createAsyncThunk<
+  void,
+  { infoHash: string; request: UpdateFileSelectionRequest }
+>(
+  'torrents/updateFileSelection',
+  async ({ infoHash, request }) => {
+    await torrentService.updateFileSelection(infoHash, request);
   }
 );
 
 const initialState: TorrentsState = {
   items: [],
+  selectedTorrent: null,
   loading: false,
   error: null,
 };
@@ -70,6 +81,9 @@ const torrentsSlice = createSlice({
       if (torrent) {
         Object.assign(torrent, action.payload);
       }
+    },
+    clearSelectedTorrent: (state) => {
+      state.selectedTorrent = null;
     },
   },
   extraReducers: (builder) => {
@@ -87,15 +101,40 @@ const torrentsSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch torrents';
       })
       // Add torrent
-      .addCase(addTorrent.fulfilled, (state, action) => {
-        state.items.push(action.payload);
+      .addCase(addTorrent.fulfilled, () => {
+        // Torrent will appear in the list on next fetch
       })
       // Delete torrent
       .addCase(deleteTorrent.fulfilled, (state, action) => {
         state.items = state.items.filter(t => t.InfoHash !== action.payload);
+        if (state.selectedTorrent?.InfoHash === action.payload) {
+          state.selectedTorrent = null;
+        }
+      })
+      // Fetch torrent files
+      .addCase(fetchTorrentFiles.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchTorrentFiles.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedTorrent = action.payload;
+        // Also update in items list
+        const index = state.items.findIndex(t => t.InfoHash === action.payload.InfoHash);
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+      })
+      .addCase(fetchTorrentFiles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch torrent files';
+      })
+      // Update file selection
+      .addCase(updateFileSelection.fulfilled, () => {
+        // File selection updated successfully
+        // The next fetchTorrentFiles will get the updated state
       });
   },
 });
 
-export const { updateTorrentProgress } = torrentsSlice.actions;
+export const { updateTorrentProgress, clearSelectedTorrent } = torrentsSlice.actions;
 export default torrentsSlice.reducer;

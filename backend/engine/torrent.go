@@ -33,9 +33,10 @@ type File struct {
 	Chunks    int
 	Completed int
 	//cloud torrent
-	Started bool
-	Percent float32
-	f       *torrent.File
+	Started  bool
+	Percent  float32
+	Priority bool // Whether file is selected for download
+	f        *torrent.File
 }
 
 func (torrent *Torrent) Update(t *torrent.Torrent) {
@@ -62,7 +63,10 @@ func (torrent *Torrent) updateLoaded(t *torrent.Torrent) {
 		path := f.Path()
 		file := torrent.Files[i]
 		if file == nil {
-			file = &File{Path: path}
+			file = &File{
+				Path:     path,
+				Priority: true, // Default: all files are selected for download
+			}
 			torrent.Files[i] = file
 		}
 		chunks := f.State()

@@ -1,12 +1,15 @@
 import { useEffect } from 'react';
-import { fetchTorrents } from '../store/slices/torrentsSlice';
+import { fetchTorrents, fetchTorrentFiles } from '../store/slices/torrentsSlice';
+import { openTorrentDetailsModal } from '../store/slices/uiSlice';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import TorrentList from './TorrentList';
 import AddTorrentButton from './AddTorrentButton';
+import TorrentDetailsModal from './TorrentDetailsModal';
 
 const Dashboard = () => {
   const dispatch = useAppDispatch();
-  const { items: torrents, loading } = useAppSelector((state) => state.torrents);
+  const { items: torrents, loading, selectedTorrent } = useAppSelector((state) => state.torrents);
+  const { torrentDetailsModalOpen } = useAppSelector((state) => state.ui);
 
   useEffect(() => {
     dispatch(fetchTorrents());
@@ -16,6 +19,15 @@ const Dashboard = () => {
 
     return () => clearInterval(interval);
   }, [dispatch]);
+
+  const handleViewFiles = (infoHash: string) => {
+    dispatch(fetchTorrentFiles(infoHash));
+    dispatch(openTorrentDetailsModal(infoHash));
+  };
+
+  const handleCloseModal = () => {
+    dispatch({ type: 'ui/closeTorrentDetailsModal' });
+  };
 
   // Ensure torrents is always an array
   const torrentArray = Array.isArray(torrents) ? torrents : [];
@@ -102,7 +114,7 @@ const Dashboard = () => {
                   Live Feed
                 </span>
               </div>
-              <TorrentList torrents={activeTorrents} />
+              <TorrentList torrents={activeTorrents} onViewFiles={handleViewFiles} />
             </div>
           )}
 
@@ -115,7 +127,7 @@ const Dashboard = () => {
                   Archive
                 </span>
               </div>
-              <TorrentList torrents={completedTorrents} />
+              <TorrentList torrents={completedTorrents} onViewFiles={handleViewFiles} />
             </div>
           )}
 
@@ -133,6 +145,13 @@ const Dashboard = () => {
           )}
         </>
       )}
+
+      {/* Torrent Details Modal */}
+      <TorrentDetailsModal
+        isOpen={torrentDetailsModalOpen}
+        torrent={selectedTorrent}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };
