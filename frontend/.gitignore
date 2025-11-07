@@ -48,6 +48,25 @@ coverage
 # Temporary files
 *.tmp
 *.temp
+
+# TypeScript
+*.tsbuildinfo
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Package manager lock files (optional - uncomment if needed)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Debug
+.vite-inspect
+
+# OS specific
+Thumbs.db
+.DS_Store
 .cache
 
 # OS files

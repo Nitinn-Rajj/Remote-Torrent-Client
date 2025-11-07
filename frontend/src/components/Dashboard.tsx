@@ -19,8 +19,21 @@ const Dashboard = () => {
 
   // Ensure torrents is always an array
   const torrentArray = Array.isArray(torrents) ? torrents : [];
-  const activeTorrents = torrentArray.filter(t => t.status === 'downloading');
-  const completedTorrents = torrentArray.filter(t => t.status === 'completed');
+  // Backend uses Started and Percent fields
+  // Active: Started and not complete, OR paused (not started) and not complete
+  const activeTorrents = torrentArray.filter(t => t.Percent < 100);
+  const completedTorrents = torrentArray.filter(t => t.Percent >= 100);
+  
+  // Calculate total download rate
+  const totalDownloadRate = torrentArray.reduce((sum, t) => sum + (t.DownloadRate || 0), 0);
+  
+  const formatSpeed = (bytesPerSecond: number): string => {
+    if (bytesPerSecond === 0) return '0 B/s';
+    const k = 1024;
+    const sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+    const i = Math.floor(Math.log(bytesPerSecond) / Math.log(k));
+    return Math.round(bytesPerSecond / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
 
   return (
     <div className="space-y-6">
@@ -42,7 +55,7 @@ const Dashboard = () => {
       ) : (
         <>
           {/* Stats */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <div className="relative overflow-hidden rounded-[1.55rem] border border-[#dcd4c1]/70 bg-[linear-gradient(135deg,_rgba(251,246,238,0.96)_0%,_rgba(236,227,213,0.92)_100%)] p-4 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.86),6px_10px_18px_rgba(68,56,42,0.1)] outline outline-1 outline-[#f8f3e8]/70">
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,_rgba(255,255,255,0.18)_1px,transparent_1px)] bg-[length:100%_10px] opacity-22" />
               <p className="relative text-[0.7rem] uppercase tracking-[0.5em] text-[#9a9e8b]">Total</p>
@@ -68,6 +81,15 @@ const Dashboard = () => {
                 {completedTorrents.length}
               </p>
               <p className="relative mt-1.5 text-[0.7rem] text-[#63735e]">Files ready to seed</p>
+            </div>
+            
+            <div className="relative overflow-hidden rounded-[1.55rem] border border-[#c8dbe0]/70 bg-[linear-gradient(135deg,_rgba(235,245,248,0.95)_0%,_rgba(218,233,238,0.9)_100%)] p-4 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.86),6px_10px_18px_rgba(68,56,42,0.1)] outline outline-1 outline-[#e8f4f7]/70">
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,_rgba(255,255,255,0.18)_1px,transparent_1px)] bg-[length:100%_10px] opacity-22" />
+              <p className="relative text-[0.7rem] uppercase tracking-[0.5em] text-[#7b8e93]">Download</p>
+              <p className="relative mt-2 font-mono text-2xl font-semibold text-[#2f3125]">
+                {formatSpeed(totalDownloadRate)}
+              </p>
+              <p className="relative mt-1.5 text-[0.7rem] text-[#5a6d72]">Current speed</p>
             </div>
           </div>
 

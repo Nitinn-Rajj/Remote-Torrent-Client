@@ -1,0 +1,17 @@
+# Root .gitignore for Remote Torrent Client
+
+# OS specific
+.DS_Store
+Thumbs.db
+*~
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+

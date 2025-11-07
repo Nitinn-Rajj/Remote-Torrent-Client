@@ -7,14 +7,13 @@ export const fetchTorrents = createAsyncThunk<Torrent[]>(
   'torrents/fetchTorrents',
   async () => {
     try {
-      const response = await api.get<Torrent[]>('/api/torrents');
+      const response = await api.get<Record<string, Torrent> | Torrent[]>('/api/torrents');
       
-      // Ensure we always return an array
-      if (Array.isArray(response.data)) {
+      // Backend returns an object with InfoHash as keys, convert to array
+      if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+        return Object.values(response.data);
+      } else if (Array.isArray(response.data)) {
         return response.data;
-      } else if (response.data && typeof response.data === 'object' && 'torrents' in response.data) {
-        // Handle if API returns { torrents: [...] }
-        return (response.data as any).torrents || [];
       }
       return [];
     } catch (error) {
@@ -66,8 +65,8 @@ const torrentsSlice = createSlice({
   name: 'torrents',
   initialState,
   reducers: {
-    updateTorrentProgress: (state, action: PayloadAction<Partial<Torrent> & { infoHash: string }>) => {
-      const torrent = state.items.find(t => t.infoHash === action.payload.infoHash);
+    updateTorrentProgress: (state, action: PayloadAction<Partial<Torrent> & { InfoHash: string }>) => {
+      const torrent = state.items.find(t => t.InfoHash === action.payload.InfoHash);
       if (torrent) {
         Object.assign(torrent, action.payload);
       }
@@ -93,7 +92,7 @@ const torrentsSlice = createSlice({
       })
       // Delete torrent
       .addCase(deleteTorrent.fulfilled, (state, action) => {
-        state.items = state.items.filter(t => t.infoHash !== action.payload);
+        state.items = state.items.filter(t => t.InfoHash !== action.payload);
       });
   },
 });

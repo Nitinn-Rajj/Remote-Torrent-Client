@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addTorrent } from '../store/slices/torrentsSlice';
+import { addTorrent, fetchTorrents } from '../store/slices/torrentsSlice';
 import { closeAddTorrentModal } from '../store/slices/uiSlice';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 
@@ -27,6 +27,8 @@ const AddTorrentModal: React.FC = () => {
       await dispatch(addTorrent(magnetLink)).unwrap();
       setMagnetLink('');
       dispatch(closeAddTorrentModal());
+      // Refresh torrent list immediately
+      dispatch(fetchTorrents());
     } catch (err) {
       setError((err as Error).message || 'Failed to add torrent');
     }

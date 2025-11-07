@@ -26,11 +26,12 @@ export const updateConfig = createAsyncThunk<Config, Partial<Config>>(
 
 const initialState: ConfigSliceState = {
   data: {
-    downloadDirectory: '',
-    incomingPort: 50007,
-    enableUpload: true,
-    enableSeeding: true,
-    maxConcurrentTorrents: 5,
+    AutoStart: true,
+    DisableEncryption: false,
+    DownloadDirectory: '',
+    EnableUpload: true,
+    EnableSeeding: false,
+    IncomingPort: 50007,
   },
   loading: false,
   error: null,

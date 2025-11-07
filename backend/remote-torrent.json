@@ -1,0 +1,8 @@
+{
+  "AutoStart": true,
+  "DisableEncryption": false,
+  "DownloadDirectory": "/home/jshishimaru/Courses/cn/project/remote-torrent/backend/downloads",
+  "EnableUpload": true,
+  "EnableSeeding": false,
+  "IncomingPort": 50007
+}

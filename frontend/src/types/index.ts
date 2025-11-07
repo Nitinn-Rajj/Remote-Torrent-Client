@@ -1,41 +1,36 @@
-// Torrent types
+// Torrent types - matching backend engine/torrent.go
 export interface TorrentFile {
-  path: string;
-  size: number;
-  downloaded: number;
+  Path: string;
+  Size: number;
+  Chunks: number;
+  Completed: number;
+  Started: boolean;
+  Percent: number;
 }
 
 export interface Torrent {
-  id: string;
-  name: string;
-  magnetURI?: string;
-  infoHash: string;
-  status: 'downloading' | 'completed' | 'paused' | 'error' | 'seeding';
-  progress: number;
-  downloadSpeed: number;
-  uploadSpeed: number;
-  downloaded: number;
-  uploaded: number;
-  size: number;
-  peers: number;
-  ratio: number;
-  eta: number;
-  files: TorrentFile[];
-  error?: string;
+  InfoHash: string;
+  Name: string;
+  Loaded: boolean;
+  Downloaded: number;
+  Size: number;
+  Files: TorrentFile[];
+  Started: boolean;
+  Dropped: boolean;
+  Percent: number;
+  DownloadRate: number;
+  UploadRate: number;
+  Peers: number;
 }
 
-// Config types
+// Config types - matching backend engine/config.go
 export interface Config {
-  downloadDirectory: string;
-  incomingPort: number;
-  enableUpload: boolean;
-  enableSeeding: boolean;
-  maxConcurrentTorrents: number;
-  maxDownloadSpeed?: number;
-  maxUploadSpeed?: number;
-  seedRatioLimit?: number;
-  enableDHT?: boolean;
-  enablePEX?: boolean;
+  AutoStart: boolean;
+  DisableEncryption: boolean;
+  DownloadDirectory: string;
+  EnableUpload: boolean;
+  EnableSeeding: boolean;
+  IncomingPort: number;
 }
 
 // UI State types

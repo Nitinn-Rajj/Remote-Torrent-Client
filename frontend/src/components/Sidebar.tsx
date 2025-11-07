@@ -115,10 +115,10 @@ const Sidebar: React.FC = () => {
                 <p className="mt-1 font-semibold text-[#404437]">Connected</p>
               </div>
             </div>
-            <div className="text-right">
+            {/* <div className="text-right">
               <p className="text-[0.68rem] uppercase tracking-[0.35em] text-[#a4a796]">Net Flux</p>
               <p className="font-mono text-sm text-[#4f5945]">+1.2 mb/s</p>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

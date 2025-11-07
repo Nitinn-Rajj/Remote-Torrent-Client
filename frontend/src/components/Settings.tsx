@@ -69,8 +69,8 @@ const Settings: React.FC = () => {
               </label>
               <input
                 type="text"
-                name="downloadDirectory"
-                value={formData.downloadDirectory}
+                name="DownloadDirectory"
+                value={formData.DownloadDirectory}
                 onChange={handleChange}
                 className="rounded-[1.1rem] border border-[#d6ccb8]/70 bg-[#f5efe4] px-4 py-3 text-sm text-[#3a3d30] shadow-[inset_2px_2px_3px_rgba(255,255,255,0.8),inset_-2px_-2px_3px_rgba(145,128,103,0.1)] outline outline-1 outline-[#f8f1e7]/60 focus:outline-none focus:ring-2 focus:ring-[#9fb89a]/50"
                 placeholder="/path/to/downloads"
@@ -84,22 +84,8 @@ const Settings: React.FC = () => {
               </label>
               <input
                 type="number"
-                name="incomingPort"
-                value={formData.incomingPort}
-                onChange={handleChange}
-                className="rounded-[1.1rem] border border-[#d6ccb8]/70 bg-[#f5efe4] px-4 py-3 text-sm text-[#3a3d30] shadow-[inset_2px_2px_3px_rgba(255,255,255,0.8),inset_-2px_-2px_3px_rgba(145,128,103,0.1)] outline outline-1 outline-[#f8f1e7]/60 focus:outline-none focus:ring-2 focus:ring-[#9fb89a]/50"
-              />
-            </div>
-
-            {/* Max Concurrent Downloads */}
-            <div className="flex flex-col gap-3">
-              <label className="text-xs font-semibold uppercase tracking-[0.4em] text-[#8a8e7a]">
-                Max Concurrent Downloads
-              </label>
-              <input
-                type="number"
-                name="maxConcurrentTorrents"
-                value={formData.maxConcurrentTorrents}
+                name="IncomingPort"
+                value={formData.IncomingPort}
                 onChange={handleChange}
                 className="rounded-[1.1rem] border border-[#d6ccb8]/70 bg-[#f5efe4] px-4 py-3 text-sm text-[#3a3d30] shadow-[inset_2px_2px_3px_rgba(255,255,255,0.8),inset_-2px_-2px_3px_rgba(145,128,103,0.1)] outline outline-1 outline-[#f8f1e7]/60 focus:outline-none focus:ring-2 focus:ring-[#9fb89a]/50"
               />
@@ -110,9 +96,10 @@ const Settings: React.FC = () => {
               <label className="text-xs font-semibold uppercase tracking-[0.4em] text-[#8a8e7a]">
                 Upload Throughput Throttle
               </label>
-              <div className="rounded-[1.1rem] border border-dashed border-[#d6ccb8]/70 bg-[#f8f3ea]/70 px-4 py-3 text-xs uppercase tracking-[0.35em] text-[#9a9e8b] shadow-[inset_1px_1px_2px_rgba(255,255,255,0.75)] outline outline-1 outline-[#faf5eb]/60" />
+              <div className="rounded-[1.1rem] border border-dashed border-[#d6ccb8]/70 bg-[#f8f3ea]/70 px-4 py-3 text-xs uppercase tracking-[0.35em] text-[#9a9e8b] shadow-[inset_1px_1px_2px_rgba(255,255,255,0.75)] outline outline-1 outline-[#f8f1e7]/60">
+                governed by enable upload toggle
+              </div>
             </div>
-
           </div>
 
           {/* Checkboxes */}
@@ -121,17 +108,17 @@ const Settings: React.FC = () => {
               <span className="relative flex h-6 w-6 items-center justify-center rounded-[0.9rem] border border-[#c4cdb0]/70 bg-[#edf3e3] shadow-[inset_1px_1px_2px_rgba(255,255,255,0.82)] outline outline-1 outline-[#f1f6ec]/60">
                 <input
                   type="checkbox"
-                  name="enableUpload"
-                  checked={formData.enableUpload}
+                  name="EnableUpload"
+                  checked={formData.EnableUpload}
                   onChange={handleChange}
                   className="absolute h-full w-full cursor-pointer opacity-0"
                 />
                 <span
                   className={`pointer-events-none text-xs font-semibold ${
-                    formData.enableUpload ? 'text-[#4f6a46]' : 'text-[#a8ae9a]'
+                    formData.EnableUpload ? 'text-[#4f6a46]' : 'text-[#a8ae9a]'
                   }`}
                 >
-                  {formData.enableUpload ? 'ON' : 'OFF'}
+                  {formData.EnableUpload ? 'ON' : 'OFF'}
                 </span>
               </span>
               <span className="flex-1">
@@ -144,17 +131,17 @@ const Settings: React.FC = () => {
               <span className="relative flex h-6 w-6 items-center justify-center rounded-[0.9rem] border border-[#c4cdb0]/70 bg-[#edf3e3] shadow-[inset_1px_1px_2px_rgba(255,255,255,0.82)] outline outline-1 outline-[#f1f6ec]/60">
                 <input
                   type="checkbox"
-                  name="enableSeeding"
-                  checked={formData.enableSeeding}
+                  name="EnableSeeding"
+                  checked={formData.EnableSeeding}
                   onChange={handleChange}
                   className="absolute h-full w-full cursor-pointer opacity-0"
                 />
                 <span
                   className={`pointer-events-none text-xs font-semibold ${
-                    formData.enableSeeding ? 'text-[#4f6a46]' : 'text-[#a8ae9a]'
+                    formData.EnableSeeding ? 'text-[#4f6a46]' : 'text-[#a8ae9a]'
                   }`}
                 >
-                  {formData.enableSeeding ? 'ON' : 'OFF'}
+                  {formData.EnableSeeding ? 'ON' : 'OFF'}
                 </span>
               </span>
               <span className="flex-1">
