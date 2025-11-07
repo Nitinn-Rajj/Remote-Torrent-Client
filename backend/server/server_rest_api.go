@@ -16,7 +16,11 @@ func (s *Server) handleRestAPI(w http.ResponseWriter, r *http.Request) {
 	// Enable CORS
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	allowedHeaders := r.Header.Get("Access-Control-Request-Headers")
+	if allowedHeaders == "" {
+		allowedHeaders = "Content-Type, Accept, ngrok-skip-browser-warning"
+	}
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
 
 	if r.Method == "OPTIONS" {
 		w.WriteHeader(http.StatusOK)

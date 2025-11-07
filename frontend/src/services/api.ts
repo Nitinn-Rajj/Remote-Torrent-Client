@@ -21,6 +21,9 @@ const api = axios.create({
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    // Required so ngrok skips the browser warning page for API requests.
+    'ngrok-skip-browser-warning': 'true',
   },
 });
 
