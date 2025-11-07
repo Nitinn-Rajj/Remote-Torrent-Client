@@ -1,7 +1,22 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
+// Load API configuration
+let apiUrl = 'http://localhost:3000/api'; // Default fallback
+
+// Fetch config.json to get the API URL
+fetch('/config.json')
+  .then(response => response.json())
+  .then(config => {
+    apiUrl = config.apiUrl || apiUrl;
+    api.defaults.baseURL = apiUrl;
+  })
+  .catch(() => {
+    // Use default if config.json is not available
+    api.defaults.baseURL = apiUrl;
+  });
+
 const api = axios.create({
-  baseURL: '', // Same origin
+  baseURL: apiUrl,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
