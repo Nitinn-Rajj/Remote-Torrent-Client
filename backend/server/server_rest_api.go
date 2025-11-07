@@ -40,6 +40,8 @@ func (s *Server) handleRestAPI(w http.ResponseWriter, r *http.Request) {
 		s.getConfig(w, r)
 	case path == "/config" && r.Method == "PUT":
 		s.updateConfig(w, r)
+	case path == "/files" && r.Method == "GET":
+		s.getFiles(w, r)
 	default:
 		http.Error(w, "Not Found", http.StatusNotFound)
 	}
@@ -172,4 +174,15 @@ func (s *Server) updateConfig(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(s.engine.Config())
+}
+
+// getFiles returns the file tree from downloads directory
+func (s *Server) getFiles(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	s.state.Lock()
+	files := s.state.Downloads
+	s.state.Unlock()
+
+	json.NewEncoder(w).Encode(files)
 }

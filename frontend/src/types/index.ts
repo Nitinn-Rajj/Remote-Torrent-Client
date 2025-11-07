@@ -33,6 +33,14 @@ export interface Config {
   IncomingPort: number;
 }
 
+// File system types - matching backend server/server_files.go
+export interface FileNode {
+  Name: string;
+  Size: number;
+  Modified: string;
+  Children?: FileNode[];
+}
+
 // UI State types
 export interface Notification {
   id: string;
@@ -62,9 +70,18 @@ export interface ConfigState {
   error: string | null;
 }
 
+export interface FilesState {
+  tree: FileNode | null;
+  loading: boolean;
+  error: string | null;
+  currentPath: string;
+  selectedFile: string | null;
+}
+
 export interface RootState {
   torrents: TorrentsState;
   config: ConfigState;
+  files: FilesState;
   ui: UIState;
 }
 
