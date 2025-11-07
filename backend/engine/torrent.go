@@ -53,6 +53,8 @@ func (torrent *Torrent) updateLoaded(t *torrent.Torrent) {
 	torrent.Size = t.Length()
 	totalChunks := 0
 	totalCompleted := 0
+	selectedSize := int64(0)
+	selectedDownloaded := int64(0)
 
 	tfiles := t.Files()
 	if len(tfiles) > 0 && torrent.Files == nil {
@@ -85,15 +87,49 @@ func (torrent *Torrent) updateLoaded(t *torrent.Torrent) {
 
 		totalChunks += file.Chunks
 		totalCompleted += file.Completed
+
+		// Calculate selected files' size and progress
+		if file.Priority {
+			selectedSize += file.Size
+			completedBytes := int64(float64(file.Size) * float64(file.Percent) / 100.0)
+			selectedDownloaded += completedBytes
+		}
+	}
+
+	// Override Size and Downloaded to reflect only selected files
+	if selectedSize > 0 {
+		torrent.Size = selectedSize
+		// Calculate percent based on chunks of selected files only
+		selectedChunks := 0
+		selectedCompletedChunks := 0
+		for _, file := range torrent.Files {
+			if file.Priority {
+				selectedChunks += file.Chunks
+				selectedCompletedChunks += file.Completed
+			}
+		}
+		if selectedChunks > 0 {
+			torrent.Percent = percent(int64(selectedCompletedChunks), int64(selectedChunks))
+		}
+	} else {
+		// No files selected, show zero
+		torrent.Size = 0
+		torrent.Percent = 0
 	}
 
 	//cacluate rate
 	now := time.Now()
-	bytes := t.BytesCompleted()
+	// Calculate bytes completed only for selected files
+	bytesCompleted := int64(0)
+	for _, file := range torrent.Files {
+		if file != nil && file.Priority && file.f != nil {
+			bytesCompleted += file.f.BytesCompleted()
+		}
+	}
+
 	stats := t.Stats()
 	// Upload tracking - BytesWrittenData is not directly accessible, use 0 for now
 	uploaded := int64(0)
-	torrent.Percent = percent(bytes, torrent.Size)
 
 	// Get peer count
 	torrent.Peers = stats.ActivePeers
@@ -102,7 +138,7 @@ func (torrent *Torrent) updateLoaded(t *torrent.Torrent) {
 		dt := float32(now.Sub(torrent.updatedAt))
 
 		// Calculate download rate
-		db := float32(bytes - torrent.Downloaded)
+		db := float32(bytesCompleted - torrent.Downloaded)
 		rate := db * (float32(time.Second) / dt)
 		if rate >= 0 {
 			torrent.DownloadRate = rate
@@ -115,7 +151,7 @@ func (torrent *Torrent) updateLoaded(t *torrent.Torrent) {
 			torrent.UploadRate = uploadRate
 		}
 	}
-	torrent.Downloaded = bytes
+	torrent.Downloaded = bytesCompleted
 	torrent.uploaded = uploaded
 	torrent.updatedAt = now
 }
